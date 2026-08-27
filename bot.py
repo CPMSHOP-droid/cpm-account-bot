@@ -11,7 +11,7 @@ from telegram.ext import (
 
 TOKEN = os.environ["BOT_TOKEN"]
 
-async def async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🛒 Hesab almaq üçün /pay yazın.\n"
         "❤️ Support — 10 ⭐ üçün /support yazın."
