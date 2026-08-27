@@ -1,4 +1,5 @@
 import os
+
 from telegram import Update, LabeledPrice
 from telegram.ext import (
     Application,
@@ -11,11 +12,13 @@ from telegram.ext import (
 
 TOKEN = os.environ["BOT_TOKEN"]
 
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🛒 Hesab almaq üçün /pay yazın.\n"
         "❤️ Support — 10 ⭐ üçün /support yazın."
     )
+
 
 async def pay(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_invoice(
@@ -26,7 +29,9 @@ async def pay(update: Update, context: ContextTypes.DEFAULT_TYPE):
         currency="XTR",
         prices=[LabeledPrice("500 Stars", 500)],
     )
-    async def support(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+
+async def support(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_invoice(
         chat_id=update.effective_chat.id,
         title="❤️ Support",
@@ -36,16 +41,19 @@ async def pay(update: Update, context: ContextTypes.DEFAULT_TYPE):
         prices=[LabeledPrice("Support", 10)],
     )
 
+
 async def precheckout(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.pre_checkout_query.answer(ok=True)
 
-async def async def successful(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+async def successful(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.successful_payment.invoice_payload == "support_10":
         await update.message.reply_text(
             "❤️ Dəstəyiniz üçün çox sağ olun! 10 ⭐ uğurla qəbul edildi."
         )
     else:
         await update.message.reply_text("Ödəniş qəbul edildi ⭐")
+
 
 app = Application.builder().token(TOKEN).build()
 
