@@ -23,7 +23,7 @@ BOT_USERNAME = "CpmAccountShopBot"
 SUPPORT_USERNAME = "OTTOCPM"
 
 # Buraya öz Telegram User ID-ni yaz
-OWNER_ID = 123456789
+OWNER_ID = 8374363232
 
 
 def is_owner(update: Update) -> bool:
