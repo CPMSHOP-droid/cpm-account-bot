@@ -21,6 +21,13 @@ TOKEN = os.environ["BOT_TOKEN"]
 CHANNEL = "@cpmpremium"
 BOT_USERNAME = "CpmAccountShopBot"
 
+# BURADA 0-ın yerinə ÖZ TELEGRAM USER ID-ini yaz
+OWNER_ID = 8374363232
+
+
+def is_owner(update: Update) -> bool:
+    return update.effective_user.id == OWNER_ID
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
@@ -182,6 +189,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def setup_channel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_owner(update):
+        await update.message.reply_text("❌ You are not authorized.")
+        return
+
     keyboard = [
         [
             InlineKeyboardButton(
@@ -210,6 +221,17 @@ async def setup_channel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(
         "✅ Shop post successfully published in @cpmpremium."
+    )
+
+
+async def owner(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_owner(update):
+        await update.message.reply_text("❌ You are not authorized.")
+        return
+
+    await update.message.reply_text(
+        "👑 Owner access confirmed.\n\n"
+        "You have administrator access to the shop bot."
     )
 
 
@@ -249,6 +271,7 @@ app = Application.builder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("setup", setup_channel))
+app.add_handler(CommandHandler("owner", owner))
 
 app.add_handler(CallbackQueryHandler(button_handler))
 
