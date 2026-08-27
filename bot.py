@@ -1,6 +1,11 @@
 import os
 
-from telegram import Update, LabeledPrice, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import (
+    Update,
+    LabeledPrice,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+)
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -13,6 +18,9 @@ from telegram.ext import (
 
 TOKEN = os.environ["BOT_TOKEN"]
 
+CHANNEL = "@cpmpremium"
+BOT_USERNAME = "CpmAccountShopBot"
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
@@ -22,7 +30,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await update.message.reply_text(
-        "🛒 Welcome!\n\nChoose an option:",
+        "🛒 PREMIUM CPM SHOP\n\n"
+        "Choose an option:",
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
 
@@ -52,7 +61,10 @@ async def premium_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def resources_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("💳 Buy Premium Resources — 200 ⭐", callback_data="buy_resources")],
+        [InlineKeyboardButton(
+            "💳 Buy Premium Resources — 200 ⭐",
+            callback_data="buy_resources"
+        )],
         [InlineKeyboardButton("🔙 Back", callback_data="back_menu")],
     ]
 
@@ -138,7 +150,8 @@ async def back_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await query.edit_message_text(
-        "🛒 Welcome!\n\nChoose an option:",
+        "🛒 PREMIUM CPM SHOP\n\n"
+        "Choose an option:",
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
 
@@ -168,6 +181,38 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await back_menu(update, context)
 
 
+async def setup_channel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                "🛒 OPEN SHOP",
+                url=f"https://t.me/{BOT_USERNAME}"
+            )
+        ]
+    ]
+
+    text = (
+        "🛒 PREMIUM CPM SHOP\n\n"
+        "💎 Premium — 500 ⭐\n"
+        "⭐ Premium Resources — 200 ⭐\n"
+        "❤️ Support — 10 ⭐\n\n"
+        "⚡ Fast Delivery\n"
+        "🔐 Secure Payment\n"
+        "🌍 Worldwide\n\n"
+        "👇 Click below to open the shop:"
+    )
+
+    await context.bot.send_message(
+        chat_id=CHANNEL,
+        text=text,
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+    await update.message.reply_text(
+        "✅ Shop post successfully published in @cpmpremium."
+    )
+
+
 async def precheckout(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.pre_checkout_query.answer(ok=True)
 
@@ -190,7 +235,8 @@ async def successful(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif payload == "support_10":
         await update.message.reply_text(
-            "❤️ Thank you very much for your support! 10 ⭐ received successfully."
+            "❤️ Thank you very much for your support! "
+            "10 ⭐ received successfully."
         )
 
     else:
@@ -202,8 +248,14 @@ async def successful(update: Update, context: ContextTypes.DEFAULT_TYPE):
 app = Application.builder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("setup", setup_channel))
+
 app.add_handler(CallbackQueryHandler(button_handler))
+
 app.add_handler(PreCheckoutQueryHandler(precheckout))
-app.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful))
+
+app.add_handler(
+    MessageHandler(filters.SUCCESSFUL_PAYMENT, successful)
+)
 
 app.run_polling()
