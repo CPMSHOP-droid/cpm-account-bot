@@ -15,19 +15,32 @@ TOKEN = os.environ["BOT_TOKEN"]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🛒 Hesab almaq üçün /pay yazın.\n"
-        "❤️ Support — 10 ⭐ üçün /support yazın."
+        "🛒 Xoş gəlmisiniz!\n\n"
+        "💎 /full — Full Premium Hesab — 500 ⭐\n"
+        "⭐ /premium — Premium Resurslar — 200 ⭐\n"
+        "❤️ /support — Support — 10 ⭐"
     )
 
 
-async def pay(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def full(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_invoice(
         chat_id=update.effective_chat.id,
-        title="Oyun hesabı",
-        description="Oyun hesabının ödənişi",
-        payload="game_account_500",
+        title="💎 Full Premium Hesab",
+        description="Full Premium oyun hesabı",
+        payload="full_premium_500",
         currency="XTR",
-        prices=[LabeledPrice("500 Stars", 500)],
+        prices=[LabeledPrice("Full Premium Hesab", 500)],
+    )
+
+
+async def premium(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_invoice(
+        chat_id=update.effective_chat.id,
+        title="⭐ Premium Resurslar",
+        description="Premium xüsusiyyətlərlə alına bilən maşınlar, geyimlər və digər resurslar aktivdir.",
+        payload="premium_resources_200",
+        currency="XTR",
+        prices=[LabeledPrice("Premium Resurslar", 200)],
     )
 
 
@@ -47,19 +60,39 @@ async def precheckout(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def successful(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.successful_payment.invoice_payload == "support_10":
+    payment = update.message.successful_payment
+    payload = payment.invoice_payload
+
+    if payload == "full_premium_500":
+        await update.message.reply_text(
+            "💎 500 ⭐ ödənişiniz uğurla qəbul edildi!\n\n"
+            "Full Premium hesabınız hazırlanır."
+        )
+
+    elif payload == "premium_resources_200":
+        await update.message.reply_text(
+            "⭐ 200 ⭐ ödənişiniz uğurla qəbul edildi!\n\n"
+            "Premium resurslar hesabınız üçün hazırlanır."
+        )
+
+    elif payload == "support_10":
         await update.message.reply_text(
             "❤️ Dəstəyiniz üçün çox sağ olun! 10 ⭐ uğurla qəbul edildi."
         )
+
     else:
-        await update.message.reply_text("Ödəniş qəbul edildi ⭐")
+        await update.message.reply_text(
+            "⭐ Ödəniş uğurla qəbul edildi."
+        )
 
 
 app = Application.builder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("pay", pay))
+app.add_handler(CommandHandler("full", full))
+app.add_handler(CommandHandler("premium", premium))
 app.add_handler(CommandHandler("support", support))
+
 app.add_handler(PreCheckoutQueryHandler(precheckout))
 app.add_handler(
     MessageHandler(filters.SUCCESSFUL_PAYMENT, successful)
