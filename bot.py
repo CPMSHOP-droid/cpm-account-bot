@@ -20,9 +20,10 @@ TOKEN = os.environ["BOT_TOKEN"]
 
 CHANNEL = "@cpmpremium"
 BOT_USERNAME = "CpmAccountShopBot"
+SUPPORT_USERNAME = "OTTOCPM"
 
-# BURADA 0-ın yerinə ÖZ TELEGRAM USER ID-ini yaz
-OWNER_ID = 8374363232
+# Buraya öz Telegram User ID-ni yaz
+OWNER_ID = 123456789
 
 
 def is_owner(update: Update) -> bool:
@@ -89,7 +90,7 @@ async def resources_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def support_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("❤️ Support — 10 ⭐", callback_data="buy_support")],
+        [InlineKeyboardButton("💳 Support — 10 ⭐", callback_data="buy_support")],
         [InlineKeyboardButton("🔙 Back", callback_data="back_menu")],
     ]
 
@@ -224,6 +225,38 @@ async def setup_channel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def setup_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_owner(update):
+        await update.message.reply_text("❌ You are not authorized.")
+        return
+
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                "💬 CONTACT SUPPORT",
+                url=f"https://t.me/{SUPPORT_USERNAME}"
+            )
+        ]
+    ]
+
+    text = (
+        "❤️ SUPPORT\n\n"
+        "Need help with an order, payment, or account?\n\n"
+        "Our support team is ready to help you.\n\n"
+        "👇 Contact us here:"
+    )
+
+    await context.bot.send_message(
+        chat_id=CHANNEL,
+        text=text,
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+    await update.message.reply_text(
+        "✅ Support post successfully published in @cpmpremium."
+    )
+
+
 async def owner(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_owner(update):
         await update.message.reply_text("❌ You are not authorized.")
@@ -271,6 +304,7 @@ app = Application.builder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("setup", setup_channel))
+app.add_handler(CommandHandler("setup_support", setup_support))
 app.add_handler(CommandHandler("owner", owner))
 
 app.add_handler(CallbackQueryHandler(button_handler))
